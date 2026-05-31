@@ -721,7 +721,15 @@ final class FlutterAgentLensServer extends MCPServer with ToolsSupport {
         name: 'analyze_jank_causes',
         description:
             'Analyze frame timing data and synthesize explanations for jank. Identifies whether build phase (Dart) or raster phase (GPU) is the bottleneck.',
-        inputSchema: ObjectSchema(properties: {}),
+        inputSchema: ObjectSchema(
+          properties: {
+            'duration_seconds': NumberSchema(
+                description: 'Sampling window in seconds (default: 5).'),
+            'target_fps': NumberSchema(
+                description:
+                    'Target frame rate used to compute the frame budget (default: 60).'),
+          },
+        ),
       ),
       _handleAnalyzeJankCauses,
     );
@@ -731,7 +739,13 @@ final class FlutterAgentLensServer extends MCPServer with ToolsSupport {
         name: 'explain_memory_breakdown',
         description:
             'Synthesize a natural-language explanation of memory usage patterns and recommend optimization strategies.',
-        inputSchema: ObjectSchema(properties: {}),
+        inputSchema: ObjectSchema(
+          properties: {
+            'force_gc': BooleanSchema(
+                description:
+                    'Force a garbage collection before measuring so only retained memory is reported (default: false).'),
+          },
+        ),
       ),
       _handleExplainMemoryBreakdown,
     );
@@ -759,8 +773,12 @@ final class FlutterAgentLensServer extends MCPServer with ToolsSupport {
             'Sample memory usage over time to identify memory leaks or growth patterns.',
         inputSchema: ObjectSchema(
           properties: {
-            'duration_seconds':
-                NumberSchema(description: 'Sampling duration (default: 10)'),
+            'duration_seconds': NumberSchema(
+                description:
+                    'Total sampling duration in seconds (default: 5).'),
+            'samples': NumberSchema(
+                description:
+                    'Number of evenly-spaced samples to take, clamped to 2-60 (default: 10).'),
           },
         ),
       ),
@@ -782,8 +800,14 @@ final class FlutterAgentLensServer extends MCPServer with ToolsSupport {
       Tool(
         name: 'get_http_profile',
         description:
-            'Get detailed HTTP request history with timing and response codes.',
-        inputSchema: ObjectSchema(properties: {}),
+            'Get detailed HTTP request history with timing and response codes, sorted slowest-first.',
+        inputSchema: ObjectSchema(
+          properties: {
+            'limit': NumberSchema(
+                description:
+                    'Maximum number of requests to return (default: 50).'),
+          },
+        ),
       ),
       _handleGetHttpProfile,
     );
